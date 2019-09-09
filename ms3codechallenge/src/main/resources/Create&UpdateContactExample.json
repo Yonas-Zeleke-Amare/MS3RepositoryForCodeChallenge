@@ -1,0 +1,22 @@
+{
+  "Identification": {
+    "FirstName": "BBBB",
+    "LastName": "rr",
+    "DOB": "06 Jan 2019",
+    "Gender": "F",
+    "Title": "XXX"
+  },
+  "Address": {
+    "type": "RE",
+    "number": 13,
+    "street": "fgg",
+    "Unit": "A4",
+    "City": "sf",
+    "State": "OH",
+    "zipcode": 12536
+  },
+  "Communication": {
+    "email": "aaa@gmail.com",
+    "cell": "4444444444"
+  }
+}

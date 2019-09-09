@@ -1,0 +1,62 @@
+#%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/2a4a0eec-b28e-46d7-97d3-6f9f46995a46/ # 
+version: v1
+title: Code_Challenge
+types:
+  Contact: !include dataType.raml
+/contact:
+  post:
+    displayName: Create Contact
+    description: Create a New Contact Information
+    body:
+      application/json:
+        type: Contact
+        example: !include example.raml
+    responses:
+      201:
+        body:
+          application/json:
+            example: 
+              msssage : Contact Created Successfuly
+  get:
+    displayName: Get All Contacts
+    description: Get All Available Contacts
+    responses:
+      200:
+        body:
+          application/json:
+            type: Contact
+            example: !include example.raml   
+  /{cell}:
+    displayName: Phone Number
+    get:
+      displayName: Get a Contact by Phone Number
+      description: Get Existing Contact Information by Phone Number
+      responses:
+        200:
+          body:
+            application/json:
+              type: Contact
+              example: !include example.raml     
+    put:
+      displayName: Update a Contact by Phone Number
+      description: Update an Existing Contact by a Phone Number
+      body:
+        application/json:
+          type: Contact
+          example: !include example.raml
+      responses:
+        200:
+          body:
+            application/json:
+              example: 
+                message : Contact Updated Successfully	
+    delete:
+      displayName: Delete a Contact Information by Phone Number
+      description: Delete an Existing Contact Information by Phone Number
+      responses:
+        200:
+          body:
+            application/json:
+              example: 
+                message : Contact Deleted Successfuly

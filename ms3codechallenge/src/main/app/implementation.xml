@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+    <flow name="CreateContactFlow">
+        <dw:transform-message doc:name="Transform Message">
+            <dw:input-payload doc:sample="sample_data\json_1.json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	FirstName: payload.Identification.FirstName,
+	LastName: payload.Identification.LastName,
+	DOB: payload.Identification.DOB,
+	Gender: payload.Identification.Gender,
+	Title: payload.Identification.Title,
+	type: payload.Address.type,
+	number: payload.Address.number,
+	street: payload.Address.street,
+	Unit: payload.Address.Unit,
+	City: payload.Address.City,
+	State: payload.Address.State,
+	zipcode: payload.Address.zipcode,
+	email: payload.Communication.email,
+	cell: payload.Communication.cell
+}
+]]></dw:set-payload>
+        </dw:transform-message>
+        <json:json-to-object-transformer returnClass="java.util.Map" doc:name="JSON to Object"/>
+        
+        <db:insert config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[INSERT INTO code_challange_db.code_challange_db_table VALUES (#[payload.FirstName], #[payload.LastName], #[payload.Gender], #[payload.DOB], #[payload.Title], #[payload.type], #[payload.number], #[payload.street], #[payload.Unit], #[payload.City], #[payload.State], #[payload.zipcode], #[payload.email], #[payload.cell]);]]></db:parameterized-query>
+        </db:insert>
+        <set-payload value="{ &quot;msssage&quot; : &quot;Contact Created Successfuly&quot; }" doc:name="Set Payload"/>
+    </flow>
+    <flow name="GetAllContactsFlow">
+        <db:select config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[SELECT * FROM code_challange_db.code_challange_db_table;]]></db:parameterized-query>
+        </db:select>
+        <dw:transform-message doc:name="Transform Message" metadata:id="53ddcf47-e098-460b-aa50-07fcb61c7d9d">
+            <dw:input-payload doc:sample="GetAllContactDB.json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload map {
+	Identification:
+	{
+		FirstName: $.FirstName,
+		LastName: $.LastName,
+		DOB: $.DOB,
+		Gender: $.Gender,
+		Title: $.Title
+	},
+	Address: {
+		type: $.type,
+		number: $.number,
+		street: $.State,
+		Unit: $.Unit,
+		City: $.City,
+		State: $.State,
+		zipcode: $.zipcode
+	},
+	Communication: {
+		email: $.email,
+		cell: $.cell
+	}
+	
+}]]></dw:set-payload>
+        </dw:transform-message>
+    </flow>
+    <flow name="GetContactByCellFlow">
+        <db:select config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[SELECT * FROM code_challange_db.code_challange_db_table WHERE cell = #[flowVars.cell];]]></db:parameterized-query>
+        </db:select>
+        <dw:transform-message doc:name="Transform Message" metadata:id="cb01f334-2d6f-4b4d-89a3-ddbb5600d11f">
+            <dw:input-payload doc:sample="GetContactByCellDB.json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+payload map {
+	Identification:
+	{
+		FirstName: $.FirstName,
+		LastName: $.LastName,
+		DOB: $.DOB,
+		Gender: $.Gender,
+		Title: $.Title
+	},
+	Address: {
+		type: $.type,
+		number: $.number,
+		street: $.State,
+		Unit: $.Unit,
+		City: $.City,
+		State: $.State,
+		zipcode: $.zipcode
+	},
+	Communication: {
+		email: $.email,
+		cell: $.cell
+	}
+	
+}]]></dw:set-payload>
+        </dw:transform-message>
+    </flow>
+    <flow name="UpdateContactByCellFlow">
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	FirstName: payload.Identification.FirstName,
+	LastName: payload.Identification.LastName,
+	DOB: payload.Identification.DOB,
+	Gender: payload.Identification.Gender,
+	Title: payload.Identification.Title,
+	type: payload.Address.type,
+	number: payload.Address.number,
+	street: payload.Address.street,
+	Unit: payload.Address.Unit,
+	City: payload.Address.City,
+	State: payload.Address.State,
+	zipcode: payload.Address.zipcode,
+	email: payload.Communication.email,
+	cell: payload.Communication.cell
+}
+]]></dw:set-payload>
+        </dw:transform-message>
+        <json:json-to-object-transformer returnClass="java.util.Map" doc:name="JSON to Object"/>
+        <db:update config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[UPDATE code_challange_db.code_challange_db_table 
+SET 
+FirstName = #[payload.FirstName], 
+LastName = #[payload.LastName],
+DOB = #[payload.DOB],
+Gender = #[payload.Gender],
+Title = #[payload.Title],
+type = #[payload.type],
+number = #[payload.number],
+street = #[payload.street],
+Unit = #[payload.Unit],
+City = #[payload.City],
+State = #[payload.State],
+zipcode = #[payload.zipcode],
+email = #[payload.email],
+cell = #[payload.cell]
+WHERE cell = #[flowVars.cell];]]></db:parameterized-query>
+        </db:update>
+        <set-payload value="{
+&quot;message&quot; : &quot;Contact Updated Successfully&quot;
+}" doc:name="Set Payload"/>
+    </flow>
+    <flow name="DeleteContactByCellFlow">
+        <db:delete config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[DELETE FROM code_challange_db.code_challange_db_table WHERE cell = #[flowVars.cell];]]></db:parameterized-query>
+        </db:delete>
+        <set-payload value="{
+&quot;message&quot; : &quot;Contact Deleted Successfuly&quot;
+}" doc:name="Set Payload"/>
+    </flow>
+</mule>

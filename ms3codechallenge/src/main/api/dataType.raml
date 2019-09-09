@@ -1,0 +1,27 @@
+#%RAML 1.0 DataType
+type: object
+properties:
+ Identification:
+  type: object
+  properties:
+      FirstName: string
+      LastName: string
+      DOB: string
+      Gender: string
+      Title: string
+ Address:
+  type: object
+  properties:
+    type: string
+    number: integer
+    street: string
+    Unit: string
+    City: string
+    State: string
+    zipcode: integer
+ Communication:
+  type: object
+  required: true
+  properties:
+    email: string
+    cell: string
